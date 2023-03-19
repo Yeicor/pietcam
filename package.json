@@ -11,6 +11,7 @@
   "author": "Yeicor",
   "license": "MIT",
   "dependencies": {
+    "@techstark/opencv-js": "^4.7.0-release.1",
     "vue": "^3.2.45",
     "vue-class-component": "^8.0.0-rc.1",
     "vuex": "^4.1.0"
@@ -20,11 +21,16 @@
     "@parcel/transformer-vue": "2.8.3",
     "babel-jest": "^29.3.1",
     "cross-env": "^7.0.3",
+    "crypto-browserify": "^3.12.0",
     "depcheck": "^1.4.3",
     "eslint": "^8.31.0",
     "eslint-plugin-vue": "^9.8.0",
+    "events": "^3.1.0",
     "parcel": "^2.8.2",
+    "path-browserify": "^1.0.0",
+    "process": "^0.11.10",
     "rimraf": "^3.0.2",
+    "stream-browserify": "^3.0.0",
     "typescript": "^4.8.4",
     "vue-test-utils": "^1.0.0-beta.11"
   },

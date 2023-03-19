@@ -29,8 +29,10 @@ export default class Camera extends Vue {
       reader.addEventListener('load', (e) => {
         if (!e.target) return;
         const img = new Image();
+        img.onload = () => {
+          this.onPicture(img);
+        }
         img.src = e.target.result as string;
-        this.onPicture(img);
       });
       reader.readAsDataURL(file);
     });
@@ -62,8 +64,10 @@ export default class Camera extends Vue {
       if (!context) return;
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const img = new Image();
+      img.onload = () => {
+        this.onPicture(img);
+      }
       img.src = canvas.toDataURL('image/png');
-      this.onPicture(img);
     }
   }
 
