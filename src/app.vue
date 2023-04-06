@@ -1,6 +1,11 @@
 <template>
   <div class="main">
     <h1>Piet Cam</h1>
+    <h2>Model</h2>
+    <button>Load model (TODO)</button>
+    <button @click="trainModel()">Train model</button>
+    <button @click="showSample(false)">Show dataset sample</button>
+    <button @click="showSample(true)">Show dataset sample (transformed)</button>
     <h2>Camera</h2>
     <Camera @picture="onPicture"/>
     <h2>Output</h2>
@@ -12,8 +17,11 @@
 import {Options, Vue} from 'vue-class-component'
 import Camera from './camera.vue';
 import Output from './output.vue';
+import {trainModel} from "./training/train";
+import {showRandomSample} from "./training/dataset";
 
 @Options({
+  methods: {showSample: showRandomSample, trainModel},
   components: {
     Camera,
     Output,
