@@ -1,8 +1,8 @@
-import Vuex from 'vuex';
+import Vuex from 'vuex'
 
-export default new Vuex.Store<{}>({
+export default new Vuex.Store<object>({
   state: {},
   mutations: {},
   actions: {},
   getters: {}
-});
+})

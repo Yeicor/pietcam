@@ -1,40 +1,44 @@
 <template>
-  <div class="main">
-    <h1>Piet Cam</h1>
-    <h2>Model</h2>
-    <button>Load model (TODO)</button>
-    <button @click="trainModel()">Train model</button>
-    <button @click="showSample(false)">Show dataset sample</button>
-    <button @click="showSample(true)">Show dataset sample (transformed)</button>
-    <h2>Camera</h2>
-    <Camera @picture="onPicture"/>
-    <h2>Output</h2>
-    <Output ref="output"/>
-  </div>
+  <v-app>
+    <v-navigation-drawer
+      v-model="drawer"
+      clipped
+    >
+      <v-list
+        class="py-1"
+        dense
+        flat
+        nav
+      >
+        <v-list-item
+          v-for="item in routes"
+          :key="item.meta.title"
+          dense
+          router
+          :to="item.path"
+        >
+          <v-icon>{{ item.meta.icon }}</v-icon>
+          <v-list-item-title>{{ item.meta.title }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+  </v-app>
 </template>
 
 <script lang="ts">
-import {Options, Vue} from 'vue-class-component'
-import Camera from './camera.vue';
-import Output from './output.vue';
-import {trainModel} from "./training/train";
-import {showRandomSample} from "./training/dataset";
+import router from './router'
 
-@Options({
-  methods: {showSample: showRandomSample, trainModel},
-  components: {
-    Camera,
-    Output,
+export default {
+  name: 'App',
+  data () {
+    return {
+      drawer: true,
+      routes: router.getRoutes()
+    }
   }
-})
-export default class App extends Vue {
-  onPicture(img: HTMLImageElement) {
-    this.$refs['output'].setImage(img);
-  }
+
 }
-
 </script>
 
 <style lang="scss">
-
 </style>
