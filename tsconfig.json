@@ -1,6 +1,0 @@
-{
-  // Empty, required for eslint
-  "compilerOptions": {
-    "strictNullChecks": true
-  }
-}
