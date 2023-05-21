@@ -1,4 +1,5 @@
-import {BLACK, MyImageData, QR_VERSION_7_MATRIX, WHITE} from "./utils/image";
+import {BLACK, MyImageData, WHITE} from "./utils/image";
+import {assert} from "./utils/tests";
 
 
 /**
@@ -10,66 +11,76 @@ import {BLACK, MyImageData, QR_VERSION_7_MATRIX, WHITE} from "./utils/image";
 export function create(program: MyImageData, locatorsScale: number = 1): MyImageData {
 
     // First, estimate the locator size to add to the original image.
-    const contentsSideLength = Math.max(program.width, program.height)
+    const contentsSideLength = Math.max(program.width, program.height) + 1 // Avoid collisions with alignment pattern
     const defaultLocatorSize = 0.1 * contentsSideLength
     let locatorsSize = Math.ceil(locatorsScale * defaultLocatorSize)
-    const locatorMultipleOf = 1 + 1 + 1 + 2 + 1 + 1 + 1 // WBWBBWBW
+    const locatorMultipleOf = LOCATOR_POSITION_MATRIX.length + 2 // 2 for white border
     locatorsSize = Math.ceil(locatorsSize / locatorMultipleOf) * locatorMultipleOf
-    const locatorScale = locatorsSize / defaultLocatorSize
+    const locatorScale = locatorsSize / locatorMultipleOf
+    assert(locatorsSize % locatorMultipleOf == 0, "Locator size (" + locatorsSize + ") must be a multiple of " + locatorMultipleOf)
+    assert(locatorScale == Math.ceil(locatorScale), "Locator scale (" + locatorScale + ") must be an integer")
+    console.debug("Locator size:", locatorsSize, "scale:", locatorScale)
 
     // Create the new image, with enough space for the locators and the original image.
-    const img = new MyImageData(program.width + 2 * locatorsSize, program.height + 2 * locatorsSize)
+    const img = new MyImageData(contentsSideLength + 2 * locatorsSize, contentsSideLength + 2 * locatorsSize)
 
-    // Fill the image with white.
+    // Fill the image with white, and the contents with black.
     for (let x = 0; x < img.width; x++) {
         for (let y = 0; y < img.height; y++) {
-            img.setPixel(x, y, WHITE)
+            if (x >= locatorsSize && x < img.width - locatorsSize - 1 && y >= locatorsSize && y < img.height - locatorsSize - 1) {
+                img.setPixel(x, y, BLACK)
+            } else img.setPixel(x, y, WHITE)
         }
     }
 
-    // Draw the timing pattern.
-    for (let x = 0; x < img.width; x++) {
-        if (x % 2 == 0) img.setPixel(x, locatorsSize - 1, BLACK)
-    }
-    for (let y = 0; y < img.height; y++) {
-        if (y % 2 == 0) img.setPixel(locatorsSize - 1, y, BLACK)
-    }
+    // // Draw the timing pattern.
+    // for (let x = 0; x < img.width; x++) {
+    //     if (x % 2 == 0) img.setPixel(x, locatorsSize - 1, BLACK)
+    // }
+    // for (let y = 0; y < img.height; y++) {
+    //     if (y % 2 == 0) img.setPixel(locatorsSize - 1, y, BLACK)
+    // }
 
-    // Draw version information (version 7).
-    for (let x = img.width - locatorsSize - QR_VERSION_7_MATRIX.length; x < img.width - locatorsSize; x++) {
-        let relX = x - (img.width - locatorsSize - QR_VERSION_7_MATRIX.length)
-        for (let y = 0; y < QR_VERSION_7_MATRIX[0].length; y++) {
-            if (QR_VERSION_7_MATRIX[relX][y] == 1) {
-                img.setPixel(x, locatorsSize + y, BLACK)
-            }
-        }
-    }
-    for (let y = img.height - locatorsSize - QR_VERSION_7_MATRIX.length; y < img.height - locatorsSize; y++) {
-        let relY = y - (img.height - locatorsSize - QR_VERSION_7_MATRIX.length)
-        for (let x = 0; x < QR_VERSION_7_MATRIX.length; x++) {
-            if (QR_VERSION_7_MATRIX[x][relY] == 1) {
-                img.setPixel(locatorsSize + x, y, BLACK)
-            }
-        }
-    }
+    // // Draw version information (version 7).
+    // for (let x = img.width - locatorsSize - QR_VERSION_7_MATRIX.length; x < img.width - locatorsSize; x++) {
+    //     let relX = x - (img.width - locatorsSize - QR_VERSION_7_MATRIX.length)
+    //     for (let y = 0; y < QR_VERSION_7_MATRIX[0].length; y++) {
+    //         if (QR_VERSION_7_MATRIX[relX][y] == 1) {
+    //             img.setPixel(x, locatorsSize + y, BLACK)
+    //         }
+    //     }
+    // }
+    // for (let y = img.height - locatorsSize - QR_VERSION_7_MATRIX.length; y < img.height - locatorsSize; y++) {
+    //     let relY = y - (img.height - locatorsSize - QR_VERSION_7_MATRIX.length)
+    //     for (let x = 0; x < QR_VERSION_7_MATRIX.length; x++) {
+    //         if (QR_VERSION_7_MATRIX[x][relY] == 1) {
+    //             img.setPixel(locatorsSize + x, y, BLACK)
+    //         }
+    //     }
+    // }
 
     // Draw the QR position and alignment locators.
     for (let i = 0; i < 2; i++) {
         for (let j = 0; j < 2; j++) {
-            const isAlignment = i == 1 && j == 1;
+            // The alignment locators are not drawn at the top or left.
+            const isAlignment = i > 0 && j > 0;
+            // Start copying the locator at baseX, baseY.
             const baseX = i * (img.width - locatorsSize)
             const baseY = j * (img.height - locatorsSize)
+            // Copy the locator, using the locatorScale.
             for (let x = 0; x < locatorsSize; x++) {
-                const unscaledX = x / locatorScale
+                const unscaledX = Math.floor(x / locatorScale)
                 for (let y = 0; y < locatorsSize; y++) {
-                    const unscaledY = y / locatorScale
-                    let isBlack = false;
-                    if (!isAlignment) {
-                        isBlack = unscaledX in [1, 3, 4, 6] || unscaledY in [1, 3, 4, 6];
-                    } else {
-                        isBlack = unscaledX in [0, 2, 4] || unscaledY in [0, 2, 4];
+                    const unscaledY = Math.floor(y / locatorScale)
+                    const matrix = isAlignment ? LOCATOR_ALIGNMENT_MATRIX : LOCATOR_POSITION_MATRIX
+                    const matrixOffset = isAlignment ? 0 : -1
+                    const matrixPosX = unscaledX + matrixOffset
+                    const matrixPosY = unscaledY + matrixOffset
+                    if (matrixPosX >= 0 && matrixPosX < matrix.length && matrixPosY >= 0 && matrixPosY < matrix[0].length) {
+                        if (matrix[matrixPosX][matrixPosY] == 1) {
+                            img.setPixel(baseX + x, baseY + y, BLACK)
+                        }
                     }
-                    if (isBlack) img.setPixel(baseX + x, baseY + y, BLACK);
                 }
             }
         }
@@ -85,3 +96,30 @@ export function create(program: MyImageData, locatorsScale: number = 1): MyImage
     // Return the image.
     return img;
 }
+
+const LOCATOR_POSITION_MATRIX = [
+    [1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 1, 0, 1],
+    [1, 0, 1, 1, 1, 0, 1],
+    [1, 0, 1, 1, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1],
+];
+
+const LOCATOR_ALIGNMENT_MATRIX = [
+    [1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 1],
+    [1, 0, 1, 0, 1],
+    [1, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1],
+];
+
+// const QR_VERSION_7_MATRIX = [
+//     [0, 0, 1],
+//     [0, 1, 0],
+//     [0, 1, 0],
+//     [0, 1, 1],
+//     [1, 1, 1],
+//     [0, 0, 0],
+// ];

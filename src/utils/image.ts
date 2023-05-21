@@ -1,3 +1,5 @@
+import {assert} from "./tests";
+
 /**
  * ImageData represents a rectangular array of pixels, containing only RGB channels.
  */
@@ -6,10 +8,37 @@ class MyImageData {
     width: number;
     height: number;
 
-    constructor(width: number, height: number, data: Uint8ClampedArray = new Uint8ClampedArray(width * height * 3)) {
+    constructor(width: number, height: number, data: Uint8ClampedArray = new Uint8ClampedArray(width * height * 3), checkSize: Boolean = true) {
         this.width = width;
         this.height = height;
+        if (checkSize) assert(data.length === width * height * 3, `data.length (${data.length}) != width * height * 3 (${width * height * 3})`);
         this.data = data;
+    }
+
+    static fromImageWithAlpha = (width: number, height: number, data: Uint8ClampedArray) => {
+        assert(data.length === width * height * 4, `data.length (${data.length}) != width * height * 4 (${width * height * 4})`);
+        const newData = new Uint8ClampedArray(width * height * 3);
+        for (let i = 0; i < newData.length; i++) {
+            newData[i * 3] = data[i * 4];
+            newData[i * 3 + 1] = data[i * 4 + 1];
+            newData[i * 3 + 2] = data[i * 4 + 2];
+            // drop alpha channel
+        }
+        return new MyImageData(width, height, newData);
+    }
+
+    /**
+     * Warning: this will return an invalid image, do not perform any operations on it (only read attributes).
+     */
+    toImageWithAlpha = () => {
+        const newData = new Uint8ClampedArray(this.width * this.height * 4);
+        for (let i = 0; i < newData.length; i++) {
+            newData[i * 4] = this.data[i * 3];
+            newData[i * 4 + 1] = this.data[i * 3 + 1];
+            newData[i * 4 + 2] = this.data[i * 3 + 2];
+            newData[i * 4 + 3] = 255; // Opaque alpha channel
+        }
+        return new MyImageData(this.width, this.height, newData, false);
     }
 
     /**
@@ -47,13 +76,4 @@ class MyImageData {
 const BLACK: [number, number, number] = [0, 0, 0];
 const WHITE: [number, number, number] = [255, 255, 255];
 
-const QR_VERSION_7_MATRIX = [
-    [0, 0, 1],
-    [0, 1, 0],
-    [0, 1, 0],
-    [0, 1, 1],
-    [1, 1, 1],
-    [0, 0, 0],
-];
-
-export {MyImageData, BLACK, WHITE, QR_VERSION_7_MATRIX};
+export {MyImageData, BLACK, WHITE};
