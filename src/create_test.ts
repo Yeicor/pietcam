@@ -2,28 +2,29 @@ import {addTest} from "./utils/tests";
 import {MyImageData} from "./utils/image";
 import {create} from "./create";
 
-function processImgFs(path: string, handler: (MyImageData) => MyImageData) {
+function processImgFs(path: string, handler: (MyImageData) => MyImageData, suffix = "_out") {
     const fs = require("fs"), PNG = require("pngjs").PNG;
-    fs.createReadStream(path)
-        .pipe(new PNG({}))
-        .on("parsed", function () {
-            let inputImg = MyImageData.fromImageWithAlpha(this.width, this.height, this.data);
-            const outputImg = handler(inputImg).toImageWithAlpha()
-            // Write the output image to a png file.
-            this.width = outputImg.width
-            this.height = outputImg.height
-            this.data = outputImg.data
-            this.pack().pipe(fs.createWriteStream(path.replace(".png", "_out.png")));
-        });
+    const pngImg = PNG.sync.read(fs.readFileSync(path));
+    const inputImg = MyImageData.fromImageWithAlpha(pngImg.width, pngImg.height, pngImg.data);
+    const outputImg = handler(inputImg).toImageWithAlpha()
+    // Write the output image to a png file.
+    pngImg.width = outputImg.width
+    pngImg.height = outputImg.height
+    pngImg.data = outputImg.data
+    const buffer = PNG.sync.write(pngImg);
+    fs.writeFileSync(path.replace(".png", suffix + ".png"), buffer);
+}
+
+export function addTestdataTests(name: string, isInput: (string) => boolean, handler: (MyImageData) => MyImageData, suffix = "_out") {
+    const fs = require("fs");
+    addTest(name, () => {
+        return fs.readdirSync("testdata").flatMap((file) => {
+            if (!isInput(file) || !file.endsWith(".png")) return []
+            addTest(`${name} > ${file}`, () => processImgFs("testdata/" + file, handler, suffix), 0)
+        })
+    })
 }
 
 export default () => {
-    let file = "testdata/hello_world.png"
-    addTest(`create(${file})`, () => {
-        processImgFs(file, (img: MyImageData) => {
-            // TODO: console.log(locate(myLocatableImage))
-            return create(img)
-        })
-    })
-    // TODO: Test and fix scaling.
+    addTestdataTests("create", (f: string) => f.indexOf("_out") === -1, (img: MyImageData) => create(img), "_out_create")
 }

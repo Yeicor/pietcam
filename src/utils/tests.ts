@@ -16,17 +16,20 @@ const green = "\x1b[32;1m",
 
 const testArray = [];
 
-function addTest(name: string, fn: () => void) {
-    testArray.push({name: name, fn: fn});
+function addTest(name: string, fn: () => void, addIndex = testArray.length) {
+    testArray.splice(addIndex, 0, {name: name, fn: fn});
 }
 
-
-function runTests() {
+async function runTests() {
     assert(typeof window == "undefined", "runTests() was not designed for the browser");
-    for (const c of testArray) {
+    while (testArray.length > 0) {
+        const c = testArray.shift();
         try {
             console.log(grey + "running" + cancel + ": " + c.name);
-            c.fn();
+            const res = c.fn();
+            if (res && res.then instanceof Function) {
+                await res;
+            }
             console.log(green + "done" + cancel + ": " + c.name);
         } catch (err) {
             console.log(red + "fail" + cancel + ": " + grey + c.name + "\n\t" + yellow + err.toString() + cancel);

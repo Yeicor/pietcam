@@ -1,10 +1,15 @@
 import {addTest, assert, runTests} from "./utils/tests";
 import addCreateTests from "./create_test"
+import addLocateTests from "./locate_test"
 
-addTest("test", () => {
-    assert(true, "true is true")
-})
+(async () => {
 
-addCreateTests()
+    addTest("test", () => {
+        assert(true, "true is true")
+    })
 
-runTests()
+    addCreateTests()
+    addLocateTests()
+
+    await runTests()
+})()

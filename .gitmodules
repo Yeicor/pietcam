@@ -1,0 +1,3 @@
+[submodule "src/jsQR"]
+	path = src/jsQR
+	url = git@github.com:cozmo/jsQR.git
