@@ -1,6 +1,6 @@
 import {assert} from "./utils/tests";
 import {MyImageData} from "./utils/image";
-import {locate} from "./locate";
+import {extract, locate} from "./locate";
 import {addTestdataTests} from "./create_test";
 
 export default () => {
@@ -25,4 +25,8 @@ export default () => {
         //
         return img
     }, "_out_locate")
+    addTestdataTests("extract", (f: string) => f.indexOf("_out_create.png") !== -1, (img: MyImageData) => {
+        let detections = locate(img);
+        return extract(img, detections[0]);
+    }, "_out_extract")
 }
