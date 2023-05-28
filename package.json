@@ -1,6 +1,6 @@
 {
   "name": "pietcam",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A Piet interpreter, capable of using your webcam as input.",
   "keywords": [
     "piet",
