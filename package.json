@@ -7,16 +7,15 @@
   "source": "src/index.ts",
   "main": "dist/main.js",
   "module": "dist/module.js",
-  "types": "dist/types.d.ts",
   "scripts": {
     "test": "NODE_ENV=development parcel build src/index_test.ts && node dist/main.js"
   },
   "dependencies": {
-    "pngjs": "^7.0.0"
+    "pngjs": "^7.0.0",
+    "piet-interpreter": "^0.0.6"
   },
   "devDependencies": {
     "@parcel/packager-ts": "2.9.1",
-    "@parcel/transformer-typescript-types": "2.9.1",
     "@types/node": "^20.2.5",
     "parcel": "^2.9.1",
     "typescript": "^5.0.4"

@@ -33,6 +33,7 @@ async function runTests() {
             console.log(green + "done" + cancel + ": " + c.name);
         } catch (err) {
             console.log(red + "fail" + cancel + ": " + grey + c.name + "\n\t" + yellow + err.toString() + cancel);
+            console.log(err.stack);
             require("process").exit(1)
         }
     }

@@ -645,25 +645,6 @@
     posthtml-render "^3.0.0"
     semver "^5.7.1"
 
-"@parcel/transformer-typescript-types@2.9.1":
-  version "2.9.1"
-  resolved "https://registry.yarnpkg.com/@parcel/transformer-typescript-types/-/transformer-typescript-types-2.9.1.tgz#6c86776d94240c168faa13d5dec3634cd4891dd2"
-  integrity sha512-pJ0rYmaSqsSB8rPDwNa3k5nAjzcCGjfEcJjcHo/B7Nx+hh/zRZQ9r7SH8Ez/q+FxmsMV+bfM7rTAAwlHmWNXJw==
-  dependencies:
-    "@parcel/diagnostic" "2.9.1"
-    "@parcel/plugin" "2.9.1"
-    "@parcel/source-map" "^2.1.1"
-    "@parcel/ts-utils" "2.9.1"
-    "@parcel/utils" "2.9.1"
-    nullthrows "^1.1.1"
-
-"@parcel/ts-utils@2.9.1":
-  version "2.9.1"
-  resolved "https://registry.yarnpkg.com/@parcel/ts-utils/-/ts-utils-2.9.1.tgz#9f3a9317af8545817f0c0450406a128d7dad3570"
-  integrity sha512-Z2xI0xyQZi9fsCOa0NiOpzj4KNU1PotvlYkXzg3jzw0gw2JhTYoCl59s1N4EUvUd4IOaQc2MmkUkSqAVoKzZkg==
-  dependencies:
-    nullthrows "^1.1.1"
-
 "@parcel/types@2.9.1":
   version "2.9.1"
   resolved "https://registry.yarnpkg.com/@parcel/types/-/types-2.9.1.tgz#6d79b5b6459119e58aac734adf2c3c4a261b983f"
@@ -1030,7 +1011,7 @@ escalade@^3.1.1:
 
 escape-string-regexp@^1.0.5:
   version "1.0.5"
-  resolved "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz"
+  resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
   integrity sha512-vbRorB5FUQWvla16U8R/qgaFIya2qGzwDrNmCZuYKrbdSUMG6I1ZCGQRefkRVhuOkIGVne7BQ35DSfo1qvJqFg==
 
 fill-range@^7.0.1:
@@ -1118,7 +1099,7 @@ is-number@^7.0.0:
 
 js-tokens@^4.0.0:
   version "4.0.0"
-  resolved "https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
 js-yaml@^4.1.0:
@@ -1356,6 +1337,11 @@ picomatch@^2.3.1:
   version "2.3.1"
   resolved "https://registry.npmjs.org/picomatch/-/picomatch-2.3.1.tgz"
   integrity sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==
+
+piet-interpreter@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/piet-interpreter/-/piet-interpreter-0.0.6.tgz#ca697be77ac8b4d48691ed4cde0e309745af0578"
+  integrity sha512-kggZBUDmspVQlmU65Dzh+7MvubS00Xl31itd9TEA6yyYzgN6ZT0oQiOocM6A7Ub04A/O9vEf56Auarj/035g7g==
 
 pngjs@^7.0.0:
   version "7.0.0"
