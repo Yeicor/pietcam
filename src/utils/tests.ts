@@ -26,15 +26,16 @@ async function runTests() {
         const c = testArray.shift();
         try {
             console.log(grey + "running" + cancel + ": " + c.name);
+            const start = performance.now()
             const res = c.fn();
             if (res && res.then instanceof Function) {
                 await res;
             }
-            console.log(green + "done" + cancel + ": " + c.name);
+            console.log(green + "done in " + (performance.now() - start).toFixed(2) + "ms" + cancel + ": " + c.name);
         } catch (err) {
-            console.log(red + "fail" + cancel + ": " + grey + c.name + "\n\t" + yellow + err.toString() + cancel);
+            console.log(red + "fail in " + (performance.now() - start).toFixed(2) + "ms" + cancel + ": " + grey + c.name + "\n\t" + yellow + err.toString() + cancel);
             console.log(err.stack);
-            require("process").exit(1)
+            globalThis["process"] && globalThis["process"].exit(1)
         }
     }
 }

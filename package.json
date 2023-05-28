@@ -12,35 +12,27 @@
   "targets": {
     "default": {
       "source": "src/index.ts",
-      "isLibrary": true,
-      "context": "browser"
+      "engines": {
+        "browsers": "> 0.5%, last 2 versions, not dead"
+      }
     },
     "test": {
       "source": "src/index_test.ts",
-      "isLibrary": true,
-      "context": "node",
-      "outputFormat": "esmodule",
+      "engines": {
+        "node": ">= 12"
+      },
       "optimize": false
     }
   },
   "scripts": {
-    "test": "parcel build --target test && mv dist/test/index_test.js dist/test/index_test.mjs && node dist/test/index_test.mjs"
+    "build": "parcel build --target default",
+    "test": "parcel build --target test && node dist/test/index_test.js"
   },
   "dependencies": {
     "piet-interpreter": "^0.0.6",
     "pngjs": "^7.0.0"
   },
   "devDependencies": {
-    "@parcel/packager-ts": "2.9.1",
-    "@types/node": "^20.2.5",
-    "assert": "^2.0.0",
-    "browserify-zlib": "^0.2.0",
-    "buffer": "^5.5.0||^6.0.0",
-    "events": "^3.1.0",
-    "parcel": "^2.9.1",
-    "process": "^0.11.10",
-    "stream-browserify": "^3.0.0",
-    "typescript": "^5.0.4",
-    "util": "^0.12.3"
+    "parcel": "^2.9.1"
   }
 }
