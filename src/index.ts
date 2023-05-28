@@ -3,8 +3,9 @@ import {newInterpreter, PietResult, runInterpreter} from "./interpreter";
 import {MyImageData} from "./utils/image";
 
 export {create} from "./create";
-export {locate, extract} from "./locate";
+export {locate, extract, Detection} from "./locate";
 export {PietResult, newInterpreter, runInterpreter} from "./interpreter";
+export {MyImageData} from "./utils/image";
 
 /** Utility to detect and execute all Piet programs constructed by [create] located in the given image. */
 export function detectAndExecute(img: MyImageData, input: () => number, maxSteps: number = 10000, maxPrograms: number = 1): Array<PietResult> {

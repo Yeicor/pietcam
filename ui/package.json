@@ -16,7 +16,7 @@
     "build": "parcel build src/index.html --no-source-maps"
   },
   "dependencies": {
-    "pietcam": "^0.0.2"
+    "pietcam": "^0.0.6"
   },
   "devDependencies": {
     "parcel": "^2.9.1"

@@ -97,7 +97,7 @@ export class PietResult {
     }
 
     /** The output of the program as a string. */
-    get outputString(): string {
+    outputString = (): string => {
         return new TextDecoder().decode(new Uint8Array(this.output))
     }
 }
@@ -110,6 +110,8 @@ export function runInterpreter(interpreter: Interpreter, input: () => number, ma
     const output = []
     const consoleFrom = 0
     let steps = 0
+
+    // TODO: API support for streaming output
 
     // Setup input hack for dynamic input and output
     interpreter.env.input = {shift: input}

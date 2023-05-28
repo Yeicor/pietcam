@@ -9,7 +9,7 @@ function runInterpreterHelloWorld(img: MyImageData) {
         return 0
     })
     console.debug("Interpretation", interpretation)
-    assert(interpretation.outputString === "Hello world!", "Output should be 'Hello world!'")
+    assert(interpretation.outputString() === "Hello world!", "Output should be 'Hello world!'")
     return null;
 }
 

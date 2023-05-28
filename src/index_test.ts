@@ -21,7 +21,7 @@ import {detectAndExecute} from "./index";
             return 0
         })
         assert(result.length >= 1, "Expected at least one result")
-        assert(result[0].outputString === "Hello world!", "Expected output to be 'Hello world!'")
+        assert(result[0].outputString() === "Hello world!", "Expected output to be 'Hello world!'")
         return null
     }, "_out_extract")
 

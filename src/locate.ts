@@ -5,7 +5,7 @@ import {extract as jsQRExtract} from "./jsQR/src/extractor";
 import {BitMatrix} from "./jsQR/src/BitMatrix";
 import {LOCATOR_POSITION_MATRIX} from "./create";
 
-type Detection = {
+export type Detection = {
     location: QRLocation,
     binaryImage: BitMatrix
 }

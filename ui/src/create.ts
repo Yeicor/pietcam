@@ -1,11 +1,9 @@
-import {create} from "../../src";
-import {MyImageData} from "../../src/utils/image";
+import {create, MyImageData} from "pietcam/src";
 
 export default function selectAndConvertPietProgram() {
-    console.log("selectAndConvertPietProgram")
-
     // Open a file selector, accepting images
     let input = document.createElement("input");
+    input.style.display = "none";
     input.type = "file";
     input.accept = "image/*";
     input.onchange = async () => {
@@ -16,6 +14,7 @@ export default function selectAndConvertPietProgram() {
 
         // Create a canvas element to capture the image
         let canvas = document.createElement("canvas");
+        canvas.style.display = "none";
         let context = canvas.getContext("2d");
 
         // Load the image into the canvas
