@@ -1,5 +1,7 @@
-import {create, next} from "piet-interpreter/dist"
+import interpreter from "piet-interpreter/dist/lib/interpreter.js";
+const {create, next} = interpreter;
 import {MyImageData} from "./utils/image";
+
 
 /** Converts a hexadecimal color to an RGB color. */
 function hexToRgb(hex) {
@@ -128,19 +130,12 @@ export function runInterpreter(interpreter: Interpreter, input: () => number, ma
                 output.push(parseInt(outputValue))
             } else throw new Error("Unknown output type: " + interpreter.env.cmd)
             if (output[output.length - 1] === 10) { // Newline
-                console.debug("piet output:", String.fromCharCode(...output.slice(consoleFrom)))
+                console.debug("[piet]", String.fromCharCode(...output.slice(consoleFrom)))
             }
             interpreter.env.output = "" // Reset internal buffer
         }
     }
-
-    if (steps >= maxSteps) {
-        console.warn("Reached maximum number of steps")
-    }
-
-    if (output[output.length - 1] !== 10) { // Newline
-        console.debug("piet output:", String.fromCharCode(...output.slice(consoleFrom)))
-    }
-
+    if (steps >= maxSteps) console.warn("Reached maximum number of steps")
+    if (output.length > consoleFrom) console.debug("[piet]", String.fromCharCode(...output.slice(consoleFrom)))
     return new PietResult(output, steps)
 }

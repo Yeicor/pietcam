@@ -31,5 +31,6 @@ export function addTestdataTests(name: string, isInput: (string) => boolean, han
 }
 
 export default () => {
-    addTestdataTests("create", (f: string) => f.indexOf("_out") === -1, (img: MyImageData) => create(img), "_out_create")
+    addTestdataTests("create", (f: string) => f.indexOf("_out") === -1,
+        (img: MyImageData) => create(img, 1), "_out_create")
 }
