@@ -1,1 +1,0 @@
-declare module "piet-interpreter-js"
