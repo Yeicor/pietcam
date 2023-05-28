@@ -1,8 +1,5 @@
-/.idea/
 /.parcel-cache/
 /yarn-error.log
 
 /node_modules/
 /dist/
-
-/testdata/*_out*
