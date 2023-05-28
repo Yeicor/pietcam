@@ -9,12 +9,7 @@ on:
 jobs:
   build:
 
-    name: "CI using Node.js ${{ matrix.node-version }}"
     runs-on: "ubuntu-latest"
-
-    strategy:
-      matrix:
-        node-version: [ "20.x" ]
 
     steps:
 
