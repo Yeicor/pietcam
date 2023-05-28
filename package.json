@@ -23,7 +23,6 @@
       "optimize": false
     }
   },
-  "type": "commonjs",
   "scripts": {
     "test": "parcel build --target test && mv dist/test/index_test.js dist/test/index_test.mjs && node dist/test/index_test.mjs"
   },
