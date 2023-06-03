@@ -86,35 +86,27 @@ export function newInterpreter(img: MyImageData): Interpreter {
 
 /** The result of running a Piet program. */
 export class PietResult {
-    /** The output of the program. */
-    output: Array<number>
     /** The number of steps executed. */
     steps: number
 
-    constructor(output: Array<number> = [], steps: number = 0) {
-        this.output = output
+    constructor(steps: number = 0) {
         this.steps = steps
-    }
-
-    /** The output of the program as a string. */
-    outputString = (): string => {
-        return new TextDecoder().decode(new Uint8Array(this.output))
     }
 }
 
 /**
- * Runs a Piet program from an interpreter, applying some defaults.
- * Returns the complete stdout (as a binary array), which is also printed to the console.
+ * Runs a Piet program from an interpreter, applying some defaults. The interpreter reads from the input function,
+ * and writes to the output function. The output function is called with a number and a boolean, where the boolean
+ * indicates whether the number is a character (true) or a number (false).
  */
-export function runInterpreter(interpreter: Interpreter, input: () => number, maxSteps: number = 10000): PietResult {
-    const output = []
-    const consoleFrom = 0
+export async function runInterpreter(interpreter: Interpreter, input: (isChar: boolean) => Promise<number>, output: (a: string|number) => void, maxSteps: number = 10000): PietResult {
     let steps = 0
 
-    // TODO: API support for streaming output
-
     // Setup input hack for dynamic input and output
-    interpreter.env.input = {shift: input}
+    let needsInput : boolean | null = null
+    interpreter.env.input = {shift: () => {
+        needsInput = interpreter.env.cmd == 'in(c)'
+    }}
 
     // Run the program until it halts, or we reach the maximum number of steps
     while (!interpreter.halt && steps++ < maxSteps) {
@@ -122,22 +114,25 @@ export function runInterpreter(interpreter: Interpreter, input: () => number, ma
         // Execute the next step of the program
         interpreter = next(interpreter)
 
+        // HACK: If the program needs input, give await for input and insert it into the interpreter's stack
+        if (needsInput != null) {
+            let inputNumber = await input(needsInput)
+            interpreter.stack.push(inputNumber)
+            needsInput = null
+        }
+
         // Print and record the output when asked
         if (interpreter.env.output.length > 0) {
             // console.log("output: ", interpreter.env.output, typeof interpreter.env.output) // Always string
-            let outputValue = interpreter.env.output
+            let outputValue: string = interpreter.env.output
             if (interpreter.env.cmd == 'out(c)') { // Char
-                output.push(outputValue.charCodeAt(0))
+                output(outputValue[0])
             } else if (interpreter.env.cmd == 'out(n)') { // Number
-                output.push(parseInt(outputValue))
+                output(parseInt(outputValue))
             } else throw new Error("Unknown output type: " + interpreter.env.cmd)
-            if (output[output.length - 1] === 10) { // Newline
-                console.debug("[piet]", String.fromCharCode(...output.slice(consoleFrom)))
-            }
             interpreter.env.output = "" // Reset internal buffer
         }
     }
     if (steps >= maxSteps) console.warn("Reached maximum number of steps")
-    if (output.length > consoleFrom) console.debug("[piet]", String.fromCharCode(...output.slice(consoleFrom)))
-    return new PietResult(output, steps)
+    return new PietResult(steps)
 }

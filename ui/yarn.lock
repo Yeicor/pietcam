@@ -1331,10 +1331,8 @@ piet-interpreter@^0.0.6:
   resolved "https://registry.yarnpkg.com/piet-interpreter/-/piet-interpreter-0.0.6.tgz#ca697be77ac8b4d48691ed4cde0e309745af0578"
   integrity sha512-kggZBUDmspVQlmU65Dzh+7MvubS00Xl31itd9TEA6yyYzgN6ZT0oQiOocM6A7Ub04A/O9vEf56Auarj/035g7g==
 
-pietcam@^0.0.6:
+pietcam@../:
   version "0.0.6"
-  resolved "https://registry.yarnpkg.com/pietcam/-/pietcam-0.0.6.tgz#b35794fc5905367ebcb94b7175f6b94e7e36022d"
-  integrity sha512-yCngkPmIXenRsdHhg1Yo/wIQ/NGugjTJaby1KpRbTyfMDK3TkcEdaqhXgK4w/bpgm7ZAo6qG9k+bakEpr+yeiA==
   dependencies:
     piet-interpreter "^0.0.6"
     pngjs "^7.0.0"

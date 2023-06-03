@@ -4,7 +4,7 @@ import {extract, locate} from "./locate";
 import {addTestdataTests} from "./create_test";
 
 export default () => {
-    addTestdataTests("locate", (f: string) => f.indexOf("_out_create.png") !== -1, (img: MyImageData) => {
+    addTestdataTests("locate", (f: string) => f.indexOf("_out_create.png") !== -1, async (img: MyImageData) => {
         let detections = locate(img);
         assert(detections.length > 0, "Expected at least one QR code.")
         // Draw the detected QR code location on the image, as a red quadrilateral (4 straight lines).
@@ -25,7 +25,7 @@ export default () => {
         //
         return img
     }, "_out_locate")
-    addTestdataTests("extract", (f: string) => f.indexOf("_out_create.png") !== -1, (img: MyImageData) => {
+    addTestdataTests("extract", (f: string) => f.indexOf("_out_create.png") !== -1, async (img: MyImageData) => {
         let detections = locate(img);
         return extract(img, detections[0]);
     }, "_out_extract")

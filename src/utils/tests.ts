@@ -24,9 +24,9 @@ async function runTests() {
     assert(typeof window == "undefined", "runTests() was not designed for the browser");
     while (testArray.length > 0) {
         const c = testArray.shift();
+        const start = performance.now()
         try {
             console.log(grey + "running" + cancel + ": " + c.name);
-            const start = performance.now()
             const res = c.fn();
             if (res && res.then instanceof Function) {
                 await res;

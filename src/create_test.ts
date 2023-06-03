@@ -2,11 +2,11 @@ import {addTest} from "./utils/tests";
 import {MyImageData} from "./utils/image";
 import {create} from "./create";
 
-function processImgFs(path: string, handler: (MyImageData) => MyImageData | null, suffix = "_out") {
+async function processImgFs(path: string, handler: (MyImageData) => Promise<MyImageData | null>, suffix = "_out") {
     const fs = require("fs"), PNG = require("pngjs").PNG;
     const pngImg = PNG.sync.read(fs.readFileSync(path));
     const inputImg = MyImageData.fromImageWithAlpha(pngImg.width, pngImg.height, pngImg.data);
-    let outputImgRaw = handler(inputImg);
+    let outputImgRaw = await handler(inputImg);
     if (outputImgRaw === null) {
         console.log("No output image returned, skipping.")
         return
@@ -20,17 +20,17 @@ function processImgFs(path: string, handler: (MyImageData) => MyImageData | null
     fs.writeFileSync(path.replace(".png", suffix + ".png"), buffer);
 }
 
-export function addTestdataTests(name: string, isInput: (string) => boolean, handler: (MyImageData) => MyImageData | null, suffix = "_out") {
+export function addTestdataTests(name: string, isInput: (string) => boolean, handler: (MyImageData) => Promise<MyImageData | null>, suffix = "_out") {
     const fs = require("fs");
-    addTest(name, () => {
-        return fs.readdirSync("testdata").flatMap((file) => {
+    addTest(name, async () => {
+        return await Promise.all(fs.readdirSync("testdata").flatMap(async (file) => {
             if (!isInput(file) || !file.endsWith(".png")) return []
-            addTest(`${name} > ${file}`, () => processImgFs("testdata/" + file, handler, suffix), 0)
-        })
+            addTest(`${name} > ${file}`, async () => processImgFs("testdata/" + file, handler, suffix), 0)
+        }))
     })
 }
 
 export default () => {
-    addTestdataTests("create", (f: string) => f.indexOf("_out") === -1,
-        (img: MyImageData) => create(img, 1), "_out_create")
+    addTestdataTests("create",(f: string) => f.indexOf("_out") === -1,
+        async (img: MyImageData) => create(img, 1), "_out_create")
 }

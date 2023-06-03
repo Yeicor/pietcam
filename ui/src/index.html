@@ -19,7 +19,7 @@
 
     <h2>Detect a Piet Cam program and execute it</h2>
     <span>
-        <button id="exe-video">From camera...</button>
+        <button id="start-video">From camera...</button>
         <button id="exe-photo">From a file...</button>
     </span>
 
@@ -29,19 +29,20 @@
 <div id="exe-screen">
 
     <h1>Piet Cam</h1>
-
-    <div id="exe-screen-contents">
-        <canvas id="exe-canvas"></canvas>
-
-        <div id="exe-screen-interpreter">
-            <h2>Interpreter</h2>
-            <div id="exe-output">No detected program</div>
-        </div>
-    </div>
-
+    <!--<video id="exe-cam"></video>--><!-- Added by JS -->
+    <canvas id="exe-overlay"></canvas>
     <div id="exe-buttons">
         <button id="exe-run">Execute</button>
         <button id="exe-cancel">Cancel</button>
+    </div>
+
+    <div id="exe-interpreter">
+        <div id="exe-interpreter-header">
+            <h2>Interpreter</h2>
+            <button id="exe-back">Back</button>
+        </div>
+        <pre id="exe-output">No program output...</pre>
+        <label for="exe-input"></label><input type="text" id="exe-input" placeholder="Input" />
     </div>
 </div>
 

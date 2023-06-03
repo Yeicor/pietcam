@@ -1,7 +1,8 @@
 export type ImageSource = {
     srcObject: MediaProvider;
+    videoElement: HTMLVideoElement | HTMLImageElement,
     isVideo: boolean,
-    getFrame: () => ImageData,
+    getFrameCPU: () => ImageData,
     stop: () => void,
 }
 
@@ -32,7 +33,8 @@ export const openCamera = async (): Promise<ImageSource> => {
     return {
         srcObject: mediaStream,
         isVideo: true,
-        getFrame: () => { // getFrame
+        videoElement: video,
+        getFrameCPU: () => { // getFrame
             context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
             return context.getImageData(0, 0, video.videoWidth, video.videoHeight);
         },
@@ -83,7 +85,8 @@ export const openImage = async (): Promise<ImageSource> => {
                 resolve({
                     srcObject: file,
                     isVideo: false,
-                    getFrame,
+                    videoElement: image,
+                    getFrameCPU: getFrame,
                     stop,
                 })
             }
