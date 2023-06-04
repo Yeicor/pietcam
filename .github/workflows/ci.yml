@@ -12,6 +12,10 @@ jobs:
 
     runs-on: "ubuntu-latest"
 
+    strategy:
+      matrix:
+        project: [ "ui", "." ]
+
     steps:
 
     - uses: "actions/checkout@v3"
@@ -21,6 +25,8 @@ jobs:
     - uses: "actions/setup-node@v3"
       with:
         cache: "yarn"
+
+    - run: "cd ${{ matrix.project }}"
 
     - run: "yarn install --frozen-lockfile"
     - run: "yarn test"
