@@ -13,9 +13,10 @@ let exeCanvas = document.getElementById("exe-overlay") as HTMLCanvasElement;
 let exeBtnRun = document.getElementById("exe-run") as HTMLButtonElement;
 let exeBtnCancel = document.getElementById("exe-cancel") as HTMLButtonElement;
 let exeInterpreter = document.getElementById("exe-interpreter") as HTMLElement;
-let exeInterpreterOutput = document.getElementById("exe-interpreter-output") as HTMLPreElement;
-let exeInterpreterInput = document.getElementById("exe-interpreter-input") as HTMLInputElement;
-let exeInterpreterBackButton = document.getElementById("exe-interpreter-back") as HTMLButtonElement;
+let exeInterpreterOutput = document.getElementById("exe-output") as HTMLPreElement;
+let exeInterpreterInput = document.getElementById("exe-input") as HTMLInputElement;
+let exeInterpreterStatus = document.getElementById("exe-interpreter-status") as HTMLSpanElement;
+let exeInterpreterBackButton = document.getElementById("exe-back") as HTMLButtonElement;
 exeBtnRun.setAttribute("disabled", "true")
 exeBtnCancel.addEventListener("click", () => {
     exeScreen.style.display = "none";
@@ -27,8 +28,8 @@ async function enterExeScreen(imageSource: ImageSource) {
     exeScreen.style.display = "flex";
     // exeVideo.src = URL.createObjectURL(imageSource.srcObject);
     // await exeVideo.play(); // Start local playback
-    detectAndExecutePietProgram(imageSource, exeCanvas, exeBtnRun, exeBtnCancel, exeInterpreter, exeInterpreterOutput, exeInterpreterInput, exeInterpreterBackButton);
+    await detectAndExecutePietProgram(imageSource, exeCanvas, exeBtnRun, exeBtnCancel, exeInterpreter, exeInterpreterOutput, exeInterpreterInput, exeInterpreterStatus, exeInterpreterBackButton);
 }
 
-document.getElementById("exe-photo").addEventListener("click", async () => enterExeScreen(await openImage()));
-document.getElementById("start-video").addEventListener("click", async () => enterExeScreen(await openImage()));
+document.getElementById("exe-photo").addEventListener("click", async () => await enterExeScreen(await openImage()));
+document.getElementById("start-video").addEventListener("click", async () => await enterExeScreen(await openImage()));

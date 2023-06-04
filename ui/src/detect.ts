@@ -1,7 +1,7 @@
 import {ImageSource} from "./imageSource";
 import {Detection, extract, locate, MyImageData, newInterpreter, runInterpreter} from "pietcam/src";
 
-export default function detectAndExecutePietProgram(imageSource: ImageSource, exeOverlay: HTMLCanvasElement, exeBtnRun: HTMLButtonElement, exeBtnCancel: HTMLButtonElement, exeInterpreter: HTMLElement, interpreterOutput: HTMLPreElement, interpreterInput: HTMLInputElement, exeInterpreterBackButton: HTMLButtonElement) {
+export default async function detectAndExecutePietProgram(imageSource: ImageSource, exeOverlay: HTMLCanvasElement, exeBtnRun: HTMLButtonElement, exeBtnCancel: HTMLButtonElement, exeInterpreter: HTMLElement, interpreterOutput: HTMLPreElement, interpreterInput: HTMLInputElement, exeInterpreterStatus: HTMLSpanElement, exeInterpreterBackButton: HTMLButtonElement) {
     // Add a listener to the stop button
     let cancelListener;
     let exeListener;
@@ -16,38 +16,48 @@ export default function detectAndExecutePietProgram(imageSource: ImageSource, ex
 
     // Make sure run is not enabled until we have a valid program detected
     exeBtnRun.setAttribute("disabled", "true");
-    exeListener = () => {
+    interpreterInput.setAttribute("disabled", "true");
+    exeListener = async () => {
         exeBtnRun.setAttribute("disabled", "true");
         exeBtnCancel.setAttribute("disabled", "true");
-        if (interval) clearInterval(interval);
+        if (interval != null) clearInterval(interval);
 
         exeInterpreter.style.display = "flex";
         let backListener;
-        backListener = () => {
+        backListener = async () => {
             exeInterpreter.style.display = "none";
             exeInterpreterBackButton.removeEventListener("click", backListener);
+            exeInterpreterStatus.innerText = "stopped";
+            // Recursively call this function to start over
+            exeBtnCancel.removeAttribute("disabled");
+            await detectAndExecutePietProgram(imageSource, exeOverlay, exeBtnRun, exeBtnCancel, exeInterpreter, interpreterOutput, interpreterInput, exeInterpreterStatus, exeInterpreterBackButton);
         }
         exeInterpreterBackButton.addEventListener("click", backListener);
 
-        executePietProgram(interpreterOutput, interpreterInput);
+        exeInterpreterStatus.innerText = "running";
+        interpreterOutput.innerText = "";
+        interpreterInput.removeAttribute("disabled");
+        await executePietProgram(interpreterOutput, interpreterInput);
+        exeInterpreterStatus.innerText = "completed";
+        interpreterInput.setAttribute("disabled", "true");
     }
     exeBtnRun.addEventListener("click", exeListener);
 
     // TODO: Add video element behind canvas overlay instead of redrawing the image every frame
 
     if (imageSource.isVideo) {
-        interval = setInterval(() => {
-            detectionLoopContents(imageSource, exeOverlay, exeBtnRun);
+        interval = setInterval(async () => {
+            await detectionLoopContents(imageSource, exeOverlay, exeBtnRun);
         }, 1000 / 30); // Will actually be much slower: lots of work to do
     } else {
-        detectionLoopContents(imageSource, exeOverlay, exeBtnRun);
+        await detectionLoopContents(imageSource, exeOverlay, exeBtnRun);
     }
 }
 
 let lastImageData: MyImageData | null = null;
 let lastDetection: Detection | null = null;
 
-function detectionLoopContents(imageSource: ImageSource, exeCanvas: HTMLCanvasElement, exeBtnRun: HTMLButtonElement) {
+async function detectionLoopContents(imageSource: ImageSource, exeCanvas: HTMLCanvasElement, exeBtnRun: HTMLButtonElement) {
     // Get and draw the initial frame to the canvas
     let frame = imageSource.getFrameCPU();
     exeCanvas.width = frame.width;
@@ -56,7 +66,7 @@ function detectionLoopContents(imageSource: ImageSource, exeCanvas: HTMLCanvasEl
     context.putImageData(frame, 0, 0);
 
     // Detect the program in the initial frame
-    lastDetection = detectPietProgram(frame);
+    lastDetection = await detectPietProgram(frame);
     if (lastDetection) {
         // Draw a quad around the program
         context.strokeStyle = "red";
@@ -77,17 +87,17 @@ function detectionLoopContents(imageSource: ImageSource, exeCanvas: HTMLCanvasEl
     }
 }
 
-function detectPietProgram(imageData: ImageData): Detection | null {
+async function detectPietProgram(imageData: ImageData): Promise<Detection | null> {
     let img = MyImageData.fromImageWithAlpha(imageData.width, imageData.height, imageData.data);
     lastImageData = img;
     let maybeOkErr = new Error("Program may be OK, as it is asking for input");
     // Locate the program(s) in the camera image
-    let detections = locate(img).filter(detection => {
+    let detections = await Promise.all(locate(img).filter(async detection => {
         try {
             let possibleProgram = extract(img, detection)
             let interpreter = newInterpreter(possibleProgram)
             let maxSteps = 10000;
-            let result = runInterpreter(interpreter, () => {
+            let result = await runInterpreter(interpreter, () => {
                 throw maybeOkErr
             }, (_) => {}, maxSteps);
             if (result.steps < maxSteps) {
@@ -97,10 +107,10 @@ function detectPietProgram(imageData: ImageData): Detection | null {
             if (e === maybeOkErr) {
                 return true // We successfully executed the program! (but it is asking for input)
             }
-            console.error(e)
+            console.info("Ignoring possible program detection due to error:", e)
         }
         return false
-    });
+    }));
     if (detections.length === 0) {
         return null
     } else {
@@ -108,7 +118,7 @@ function detectPietProgram(imageData: ImageData): Detection | null {
     }
 }
 
-function executePietProgram(interpreterOutput: HTMLPreElement, interpreterInput: HTMLInputElement) {
+async function executePietProgram(interpreterOutput: HTMLPreElement, interpreterInput: HTMLInputElement) {
     let img = lastImageData;
     let detection = lastDetection;
     if (!img || !detection) {
@@ -117,7 +127,7 @@ function executePietProgram(interpreterOutput: HTMLPreElement, interpreterInput:
     let possibleProgram = extract(img, detection);
     let interpreter = newInterpreter(possibleProgram);
     let maxSteps = 10000;
-    let result = runInterpreter(interpreter,  () => {
+    let result = await runInterpreter(interpreter,  () => {
         function pollInputChar() {
             let nextChar = interpreterInput.value[0];
             interpreterInput.value = interpreterInput.value.slice(1);
@@ -129,15 +139,22 @@ function executePietProgram(interpreterOutput: HTMLPreElement, interpreterInput:
         }
         // Wait for input from the user
         return new Promise((resolve) => {
+            let msg = "<waiting for input...>";
+            interpreterOutput.innerText += msg;
             let inputListener;
             inputListener = () => {
                 interpreterInput.removeEventListener("input", inputListener);
+                interpreterOutput.innerText = interpreterOutput.innerText.substring(0, interpreterOutput.innerText.length - msg.length);
                 resolve(pollInputChar());
             }
             interpreterInput.addEventListener("input", inputListener);
         })
     }, (output) => {
-        interpreterOutput.textContent += output + "\n";
+        if (typeof output === "number") {
+            interpreterOutput.innerText += "0x" + output.toString(16) + " "; // Somewhat usable hex output
+        } else {
+            interpreterOutput.innerText += output;
+        }
     }, maxSteps);
     console.log(result);
     if (result.steps < maxSteps) {
