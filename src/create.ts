@@ -1,7 +1,7 @@
 import {BLACK, MyImageData, WHITE} from "./utils/image";
 import {assert} from "./utils/tests";
 
-const MIN_SIDE_LENGTH = 8
+export const MIN_SIDE_LENGTH = 8
 
 
 /**

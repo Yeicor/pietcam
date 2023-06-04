@@ -1,6 +1,6 @@
 import selectAndConvertPietProgram from './create';
 import detectAndExecutePietProgram from './detect';
-import {ImageSource, openImage} from "./imageSource";
+import {ImageSource, openCamera, openImage} from "./imageSource";
 
 
 document.getElementById("create").addEventListener("click", selectAndConvertPietProgram);
@@ -31,5 +31,5 @@ async function enterExeScreen(imageSource: ImageSource) {
     await detectAndExecutePietProgram(imageSource, exeCanvas, exeBtnRun, exeBtnCancel, exeInterpreter, exeInterpreterOutput, exeInterpreterInput, exeInterpreterStatus, exeInterpreterBackButton);
 }
 
-document.getElementById("exe-photo").addEventListener("click", async () => await enterExeScreen(await openImage()));
-document.getElementById("start-video").addEventListener("click", async () => await enterExeScreen(await openImage()));
+document.getElementById("start-photo").addEventListener("click", async () => await enterExeScreen(await openImage()));
+document.getElementById("start-video").addEventListener("click", async () => await enterExeScreen(await openCamera()));

@@ -99,13 +99,14 @@ export class PietResult {
  * and writes to the output function. The output function is called with a number and a boolean, where the boolean
  * indicates whether the number is a character (true) or a number (false).
  */
-export async function runInterpreter(interpreter: Interpreter, input: (isChar: boolean) => Promise<number>, output: (a: string|number) => void, maxSteps: number = 10000): PietResult {
+export async function runInterpreter(interpreter: Interpreter, input: (asksForChar: boolean) => Promise<number>, output: (a: string|number) => void, maxSteps: number = 10000): Promise<PietResult> {
     let steps = 0
 
     // Setup input hack for dynamic input and output
     let needsInput : boolean | null = null
     interpreter.env.input = {shift: () => {
         needsInput = interpreter.env.cmd == 'in(c)'
+        return "0" // Will be overwritten by actual input before next step
     }}
 
     // Run the program until it halts, or we reach the maximum number of steps
@@ -117,7 +118,8 @@ export async function runInterpreter(interpreter: Interpreter, input: (isChar: b
         // HACK: If the program needs input, give await for input and insert it into the interpreter's stack
         if (needsInput != null) {
             let inputNumber = await input(needsInput)
-            interpreter.stack.push(inputNumber)
+            interpreter.env.stack.pop() // Remove the placeholder input
+            interpreter.env.stack.push(inputNumber)
             needsInput = null
         }
 

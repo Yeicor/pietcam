@@ -3,7 +3,7 @@ import {binarize as jsQRBinarize} from "./jsQR/src/binarizer";
 import {locate as jsQRLocate, QRLocation} from "./jsQR/src/locator";
 import {extract as jsQRExtract} from "./jsQR/src/extractor";
 import {BitMatrix} from "./jsQR/src/BitMatrix";
-import {LOCATOR_POSITION_MATRIX} from "./create";
+import {LOCATOR_POSITION_MATRIX, MIN_SIDE_LENGTH} from "./create";
 
 export type Detection = {
     location: QRLocation,
@@ -29,7 +29,7 @@ export function locate(img: MyImageData): Detection[] {
 /**
  * Given a pietcam image and the detection information, returns the extracted Piet program, ready for execution.
  */
-export function extract(img: MyImageData, detection: Detection): MyImageData {
+export function extract(img: MyImageData, detection: Detection, maxProgramSide: number = 65536): MyImageData {
     let {matrix, mappingFunction} = jsQRExtract(detection.binaryImage, detection.location);
     // The returned matrix starts at the top left locator of the QR code.
     // console.debug("Extracted matrix:", matrix)+
@@ -45,13 +45,22 @@ export function extract(img: MyImageData, detection: Detection): MyImageData {
         // console.debug("Bit", bitIndex, "is", bitPresent, "programSidePixels", programSidePixels.toString(2), programSidePixels)
     }
     console.debug("Decoded contents side length:", programSidePixels)
+    if (programSidePixels > maxProgramSide) {
+        throw new Error("Detected program side length is too large: " + programSidePixels + " > " + maxProgramSide)
+    }
+    if (programSidePixels < MIN_SIDE_LENGTH) {
+        throw new Error("Detected program side length is too small: " + programSidePixels + " < " + MIN_SIDE_LENGTH)
+    }
 
     // Extract the Piet program from the original image thanks to the mapping function.
-    let pietProgramSidePixels = programSidePixels - 2; // We don't need the white border.
-    let programSideVirtual = matrix.width - (locatorSize + 2) * 2 - 1; // 2 for internal white borders and 1 for alignment locator
-    let virtualToPixels = programSideVirtual / pietProgramSidePixels;
-    console.debug("Scaling out by", virtualToPixels, " -- ", programSideVirtual, pietProgramSidePixels)
-    let pietProgram = new MyImageData(pietProgramSidePixels, pietProgramSidePixels)
+    let programSideCodel = programSidePixels - 2; // We don't need the white border.
+    let programSideQR = matrix.width - (locatorSize + 2) * 2 - 1; // 2 for internal white borders and 1 for alignment locator
+    if (programSideQR < programSideCodel) { // We expect the piet program codels to be of the same size as 1 QR pixel or less.
+        throw new Error("Virtual to pixels ratio is too small: " + programSideQR + " QR pixels with " + programSideCodel + " codels")
+    }
+    let virtualToPixels = programSideQR / programSideCodel;
+    console.debug("Scaling out by", virtualToPixels, " -- ", programSideQR, programSideCodel)
+    let pietProgram = new MyImageData(programSideCodel, programSideCodel)
     for (let outX = 0; outX < pietProgram.width; outX++) {
         for (let outY = 0; outY < pietProgram.height; outY++) {
             const inScaledX = outX * virtualToPixels

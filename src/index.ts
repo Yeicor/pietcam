@@ -8,7 +8,7 @@ export {PietResult, newInterpreter, runInterpreter} from "./interpreter";
 export {MyImageData} from "./utils/image";
 
 /** Utility to detect and execute all Piet programs constructed by [create] located in the given image. */
-export async function detectAndExecute(img: MyImageData, input: (isChar: boolean) => Promise<number>, output: (a: string|number) => void, maxSteps: number = 10000, maxPrograms: number = 1): Promise<Array<PietResult>> {
+export async function detectAndExecute(img: MyImageData, input: (asksForChar: boolean) => Promise<number>, output: (a: string|number) => void, maxProgramSide: number = 65536, maxSteps: number = 10000, maxPrograms: number = 1): Promise<Array<PietResult>> {
     // Locate the program(s) in the camera image
     let detections = locate(img);
 
@@ -16,7 +16,7 @@ export async function detectAndExecute(img: MyImageData, input: (isChar: boolean
     let allResults = []
     for (let i = 0; i < detections.length; i++) {
         try {
-            let possibleProgram = extract(img, detections[i])
+            let possibleProgram = extract(img, detections[i], maxProgramSide)
             let interpreter = newInterpreter(possibleProgram)
             let result = await runInterpreter(interpreter, input, output, maxSteps);
             allResults.push(result)

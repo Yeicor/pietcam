@@ -70,3 +70,7 @@ button {
     cursor: pointer;
     margin: 8px;
 }
+
+pre {
+    white-space: pre-wrap;
+}
