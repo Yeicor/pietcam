@@ -26,8 +26,9 @@ jobs:
       with:
         cache: "yarn"
 
-    - run: |
+    - name: "Test"
+      run: |
         cd "${{ matrix.projectDir }}"
         yarn install --frozen-lockfile
-        yarn build
+        yarn test
 

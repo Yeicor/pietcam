@@ -25,7 +25,8 @@ jobs:
       with:
         cache: "yarn"
 
-    - run: |
+    - name: "Build"
+      run: |
         cd ui
         yarn install --frozen-lockfile
         yarn build
