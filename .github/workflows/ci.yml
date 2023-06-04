@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        project: [ "ui", "." ]
+        projectDir: [ "ui", "." ]
 
     steps:
 
@@ -26,7 +26,8 @@ jobs:
       with:
         cache: "yarn"
 
-    - run: "cd ${{ matrix.project }}"
+    - run: |
+        cd "${{ matrix.projectDir }}"
+        yarn install --frozen-lockfile
+        yarn build
 
-    - run: "yarn install --frozen-lockfile"
-    - run: "yarn test"

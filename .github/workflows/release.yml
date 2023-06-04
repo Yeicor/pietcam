@@ -17,22 +17,22 @@ jobs:
 
     steps:
 
-      - uses: "actions/checkout@v3"
-        with:
-          submodules: "true"
+    - uses: "actions/checkout@v3"
+      with:
+        submodules: "true"
 
-      - uses: "actions/setup-node@v3"
-        with:
-          cache: "yarn"
+    - uses: "actions/setup-node@v3"
+      with:
+        cache: "yarn"
 
-      - run: "cd ui"
+    - run: |
+        cd ui
+        yarn install --frozen-lockfile
+        yarn build
 
-      - run: "yarn install --frozen-lockfile"
-      - run: "yarn build"
-
-      - name: "Deploy"
-        uses: "peaceiris/actions-gh-pages@v3"
-        if: "${{ github.ref == 'refs/heads/main' }}"
-        with:
-          github_token: "${{ secrets.GITHUB_TOKEN }}"
-          publish_dir: "ui/dist"
+    - name: "Deploy"
+      uses: "peaceiris/actions-gh-pages@v3"
+      if: "${{ github.ref == 'refs/heads/main' }}"
+      with:
+        github_token: "${{ secrets.GITHUB_TOKEN }}"
+        publish_dir: "ui/dist"
