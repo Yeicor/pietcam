@@ -4,13 +4,19 @@ updates:
   directory: "/"
   schedule:
     interval: "weekly"
+    day: "saturday"
+    time: "09:00"
 
 - package-ecosystem: "gitsubmodule"
   directory: "/"
   schedule:
     interval: "weekly"
+    day: "saturday"
+    time: "09:00"
 
 - package-ecosystem: "github-actions"
   directory: "/.github/workflows/"
   schedule:
     interval: "weekly"
+    day: "saturday"
+    time: "09:00"
